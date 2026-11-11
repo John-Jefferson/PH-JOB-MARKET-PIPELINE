@@ -1,0 +1,29 @@
+# Virtual environments
+*-env/
+venv/
+.venv/
+
+# Secrets
+.env
+profiles.yml
+
+# dbt
+target/
+dbt_packages/
+logs/
+
+# Airflow
+airflow.db
+airflow-webserver.pid
+
+# Python
+__pycache__/
+
+*.pyc
+.ipynb_checkpoints/
+
+# Data & OS
+*.csv
+!seeds/*.csv
+data/
+Thumbs.db
