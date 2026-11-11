@@ -1,0 +1,148 @@
+version: 2
+
+models:
+  - name: fct_job_postings
+    description: "One row per distinct source-platform job posting, with conformed posting attributes."
+    columns:
+      - name: job_posting_key
+        description: "Stable key derived from the source platform and posting URL."
+        tests:
+          - not_null
+          - unique
+      - name: link
+        description: "Source URL identifying the job posting."
+        tests:
+          - not_null
+      - name: platform_source
+        description: "Platform from which the posting was collected."
+        tests:
+          - not_null
+
+  - name: dim_title
+    description: "Unique normalized job title labels."
+    columns:
+      - name: title_key
+        tests:
+          - not_null
+          - unique
+      - name: title
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_skill
+    description: "Unique normalized skill labels."
+    columns:
+      - name: skill_key
+        tests:
+          - not_null
+          - unique
+      - name: skill
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_qualification
+    description: "Unique normalized qualification labels."
+    columns:
+      - name: qualification_key
+        tests:
+          - not_null
+          - unique
+      - name: qualification
+        tests:
+          - not_null
+          - unique
+
+  - name: bridge_job_title
+    description: "Many-to-many mapping between postings and matched title labels."
+    columns:
+      - name: job_posting_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fct_job_postings')
+                field: job_posting_key
+      - name: title_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_title')
+                field: title_key
+
+  - name: bridge_job_skill
+    description: "Many-to-many mapping between postings and extracted skills."
+    columns:
+      - name: job_posting_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fct_job_postings')
+                field: job_posting_key
+      - name: skill_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_skill')
+                field: skill_key
+
+  - name: bridge_job_qualification
+    description: "Many-to-many mapping between postings and extracted qualifications."
+    columns:
+      - name: job_posting_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('fct_job_postings')
+                field: job_posting_key
+      - name: qualification_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_qualification')
+                field: qualification_key
+
+  - name: mart_skill_demand
+    description: "Current snapshot posting counts by skill and source platform."
+    columns:
+      - name: skill_key
+        tests:
+          - not_null
+      - name: platform_source
+        tests:
+          - not_null
+      - name: job_posting_count
+        tests:
+          - not_null
+
+  - name: mart_role_distribution
+    description: "Current snapshot posting counts by matched title and source platform."
+    columns:
+      - name: title_key
+        tests:
+          - not_null
+      - name: platform_source
+        tests:
+          - not_null
+      - name: job_posting_count
+        tests:
+          - not_null
+
+  - name: mart_location_summary
+    description: "Current snapshot posting counts and attribute variety by location and platform."
+    columns:
+      - name: location
+        tests:
+          - not_null
+      - name: platform_source
+        tests:
+          - not_null
+      - name: job_posting_count
+        tests:
+          - not_null
